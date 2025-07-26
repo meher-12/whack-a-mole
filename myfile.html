@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Whack-a-Mole</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef7ff;
+      text-align: center;
+      padding-top: 50px;
+    }
+
+    .game {
+      display: inline-block;
+      padding: 30px;
+      background: #eaf5ff;
+      border-radius: 10px;
+    }
+
+    .moles {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .mole {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background-color: gray;
+      cursor: pointer;
+      border: 2px solid black;
+    }
+
+    .mole.active {
+      background-color: green;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    #message {
+      font-size: 20px;
+      color: green;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="game">
+    <h1>Whack-a-Mole</h1>
+    <p>Score: <span id="score">0</span></p>
+    <div class="moles">
+      <div class="mole"></div>
+      <div class="mole"></div>
+      <div class="mole"></div>
+    </div>
+    <p id="message" class="hidden">🎉 You win! 🎉</p>
+    <button id="restart" class="hidden">Restart</button>
+  </div>
+
+  <script>
+    const moles = document.querySelectorAll('.mole');
+    const scoreEl = document.getElementById('score');
+    const message = document.getElementById('message');
+    const restartBtn = document.getElementById('restart');
+
+    let score = 0;
+    let activeIndex = -1;
+    let gameInterval = null;
+
+    function startGame() {
+      score = 0;
+      scoreEl.textContent = score;
+      message.classList.add('hidden');
+      restartBtn.classList.add('hidden');
+      enableMoles();
+      gameInterval = setInterval(randomMole, 1000);
+    }
+
+    function randomMole() {
+      moles.forEach(m => m.classList.remove('active'));
+      activeIndex = Math.floor(Math.random() * moles.length);
+      moles[activeIndex].classList.add('active');
+    }
+
+    function stopGame() {
+      clearInterval(gameInterval);
+      disableMoles();
+      message.classList.remove('hidden');
+      restartBtn.classList.remove('hidden');
+    }
+
+    function handleClick(index) {
+      if (index === activeIndex) {
+        score++;
+        scoreEl.textContent = score;
+        if (score >= 5) {
+          stopGame();
+        }
+      }
+    }
+
+    function enableMoles() {
+      moles.forEach((mole, index) => {
+        mole.addEventListener('click', () => handleClick(index));
+      });
+    }
+
+    function disableMoles() {
+      moles.forEach((mole, index) => {
+        mole.replaceWith(mole.cloneNode(true)); // removes all listeners
+      });
+    }
+
+    restartBtn.addEventListener('click', () => {
+      const newMoles = document.querySelectorAll('.mole');
+      newMoles.forEach(m => m.classList.remove('active'));
+      startGame();
+    });
+
+    startGame();
+  </script>
+</body>
+</html>
